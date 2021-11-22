@@ -14,8 +14,6 @@ cd build
 cmake ..
 make
 
-# Compilation errors in Test can be ignored
-
 cd ../../
 
 # Checkout the analysis code
