@@ -53,13 +53,12 @@ if __name__ == "__main__":
     # now add
     os.system(toadd)
 
+    # copy back to EOS
+    tocp = "cp Merged_{fullname}_{number}.root {directory}".format(fullname=fullnamestart, number=theend, directory=directory)
+    os.system(tocp)
+
     # finally remove the files before merging
     # print('now cancel')
     for filetc in glob.glob('{fullname}*{number}.root'.format(fullname=fullnamestart,  number=theend)):
       # print(filetc)
       os.system("rm {}".format(filetc))
-
-  
-    
-
-    #print('Done')
