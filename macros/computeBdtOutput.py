@@ -29,9 +29,9 @@ def computeBdt(isPFPF):
     # To be modified - input root tree with variables
     data_dir = '/tmp/crovelli'
     if (isPFPF==1):
-        tf = ROOT.TFile.Open('{d}/FormattedTnPForB_PFPF_March21_BuToKee_mc_bparkPU_newMatch.root'.format(d=data_dir), "update")
+        tf = ROOT.TFile.Open('{d}/FormattedTnPForB_PFPF_Merged_March21_BuToKee_mc_bparkPU_0.root'.format(d=data_dir), "update")
     if (isPFPF==0):
-        tf = ROOT.TFile.Open('{d}/FormattedTnPForB_PFLPT_March21_BuToKee_mc_bparkPU_newMatch.root'.format(d=data_dir), "update")
+        tf = ROOT.TFile.Open('{d}/FormattedTnPForB_PFLPT_Merged_March21_BuToKee_mc_bparkPU_0.root'.format(d=data_dir), "update")
         
     # -------------------------------------------------
     # -------------------------------------------------
@@ -65,7 +65,7 @@ def computeBdt(isPFPF):
 
         #if ie>500: continue
 
-        if ie%500==1: print ("Processing event ie = ",ie)
+        if ie%100==1: print ("Processing event ie = ",ie)
 
         # inputs to BDT
         f0  = tftree.B_svprob
@@ -100,7 +100,6 @@ def computeBdt(isPFPF):
         # Store the BDT score in the tree as an extra branch
         xgb_arr[0] = float(ypred)
         branch.Fill()
-        # print('ypred = ',ypred)
         
 
     # --------------------------------------------------
