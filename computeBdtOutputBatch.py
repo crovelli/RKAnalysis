@@ -1,5 +1,6 @@
 #!/usr/bin/env python3.9
 import os, math, optparse, ROOT
+ROOT.PyConfig.IgnoreCommandLineOptions = True
 from array import array
 from root_numpy import hist2array
 import numpy as np
@@ -108,6 +109,8 @@ if __name__ == "__main__":
     parser.add_option('', '--rootfile' , type='string' , default='pippo.root' , help='root file to be analyzed (wo dir)')
     parser.add_option('', '--eosdir' , type='string' , default='/eos/cms/store/user/crovelli/LowPtEle/TnpDataTest/')
     (options, args) = parser.parse_args()
+
+    import os, sys
 
     if options.isPFPF in ['0']: computeBdtBatch(0, options.rootfile, options.eosdir)
     if options.isPFPF in ['1']: computeBdtBatch(1, options.rootfile, options.eosdir)
