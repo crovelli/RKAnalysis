@@ -19,13 +19,15 @@ import re
 import time
 import argparse
 import datetime
-from sklearn.externals import joblib
+import joblib
 import glob
 from shutil import copy2
 
 def makeCondorFile(jobdir, srcFiles, options):
     dummy_exec = open(jobdir+'/dummy_exec.sh','w')
     dummy_exec.write('#!/bin/bash\n')
+    dummy_exec.write('cd {here}\n'.format(here=os.environ['PWD']))
+    dummy_exec.write('eval `scramv1 runtime -sh` \n')
     dummy_exec.write('bash $*\n')
     dummy_exec.close()
      
@@ -79,11 +81,11 @@ def main():
     diskoutputmain = diskoutputdir+"/"+opt.prefix+"/"+output
 
     jobdir = opt.prefix+"/"+output
-    logdir = jobdir+"/log/"
-    os.system("mkdir -p "+jobdir)
+    logdir = os.environ['PWD']+'/'+jobdir
     os.system("mkdir -p "+logdir)
-    os.system("mkdir -p "+jobdir+"/src/")
-    os.system("mkdir -p "+jobdir+"/cfg/")
+    os.system("mkdir -p "+logdir+"/log/")
+    os.system("mkdir -p "+logdir+"/src/")
+    os.system("mkdir -p "+logdir+"/cfg/")
 
     outputroot = diskoutputmain+"/root/"
 
@@ -124,13 +126,12 @@ def main():
             outputfile.write('cd '+pwd+'\n')
 
             outputfile.write('echo $PWD\n')
-            #outputfile.write('cmsenv\n')
             outputfile.write('source /cvmfs/sft.cern.ch/lcg/views/LCG_96python3/x86_64-centos7-gcc8-opt/setup.sh\n')
 
             if(opt.ispfpf=='1'):
-                outputfile.write('python computeBdtOutputBatch.py --isPFPF=1 --rootfile='+ntpfileA+' --eosdir='+opt.eosdir+' \n')
+                outputfile.write('python computeBdtOutputBatch.py --isPFPF=1 --ijob='+str(ijob)+' --rootfile='+ntpfileA+' --eosdir='+opt.eosdir+' \n')
             if(opt.ispfpf=='0'): 
-                outputfile.write('python computeBdtOutputBatch.py --isPFPF=0 --rootfile='+ntpfileA+' --eosdir='+opt.eosdir+' \n')
+                outputfile.write('python computeBdtOutputBatch.py --isPFPF=0 --ijob='+str(ijob)+' --rootfile='+ntpfileA+' --eosdir='+opt.eosdir+' \n')
 
             # change name to the outputfile with BDT added    
             rootoutputfile = ntpfileA
@@ -139,7 +140,7 @@ def main():
 
             if(opt.eos!=''): 
                 outputfile.write('cp '+rootoutputfile+' '+opt.eosdir+' \n')
-                outputfile.write('rm '+rootoutputfile+' \n')
+#                outputfile.write('rm '+rootoutputfile+' \n')
             outputfile.close()
 
             logfile = logdir+output+"_"+str(ijob)+".log"

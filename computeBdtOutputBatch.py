@@ -5,7 +5,8 @@ from array import array
 from root_numpy import hist2array
 import numpy as np
 
-from sklearn.externals import joblib
+import joblib
+#from sklearn.externals import joblib
 from xgboost import XGBClassifier
 import glob
 import xgboost as xgb 
@@ -14,7 +15,7 @@ from shutil import copy2
 ROOT.gStyle.SetOptStat(111111)
 ROOT.gROOT.SetBatch(True)
 
-def computeBdtBatch(isPFPF, therootfile, theeosdir):
+def computeBdtBatch(isPFPF, ijob, therootfile, theeosdir):
 
     # -------------------------------------------------
     # XGBoost model in .pkl
@@ -81,12 +82,14 @@ def computeBdtBatch(isPFPF, therootfile, theeosdir):
         f16 = tftree.B_i3dsig
 
         # format the BDT inputs
-        with open('dumpThisEntry.txt', 'w') as f:
+        if (isPFPF==1): thefile = os.environ['PWD']+'/dumpThisEntryPFPF_'+ijob+'.txt'
+        if (isPFPF==0): thefile = os.environ['PWD']+'/dumpThisEntryPFLPT_'+ijob+'.txt'
+        with open(thefile, 'w') as f:
             line = "1 0:{} 1:{} 2:{} 3:{} 4:{} 5:{} 6:{} 7:{} 8:{} 9:{} 10:{} 11:{} 12:{} 13:{} 14:{} 15:{} 16:{}".format(f0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16) 
             f.write(line)
             f.write('\n')
         f.close()    
-        dtest = xgb.DMatrix('dumpThisEntry.txt', silent =1)
+        dtest = xgb.DMatrix(thefile, silent =1)
 
         # compute the BDT score   
         ypred = booster.predict(dtest)
@@ -106,11 +109,13 @@ if __name__ == "__main__":
 
     parser = optparse.OptionParser(usage='usage: %prog [opts] ', version='%prog 1.0')    
     parser.add_option('', '--isPFPF' , type='string' , default='1' , help='isPFPFP (options = 1 (default) or 0)')
+    parser.add_option('', '--ijob' , type='string' , default='0' , help='which job')
+
     parser.add_option('', '--rootfile' , type='string' , default='pippo.root' , help='root file to be analyzed (wo dir)')
     parser.add_option('', '--eosdir' , type='string' , default='/eos/cms/store/user/crovelli/LowPtEle/TnpDataTest/')
     (options, args) = parser.parse_args()
 
     import os, sys
 
-    if options.isPFPF in ['0']: computeBdtBatch(0, options.rootfile, options.eosdir)
-    if options.isPFPF in ['1']: computeBdtBatch(1, options.rootfile, options.eosdir)
+    if options.isPFPF in ['0']: computeBdtBatch(0, options.ijob, options.rootfile, options.eosdir)
+    if options.isPFPF in ['1']: computeBdtBatch(1, options.ijob, options.rootfile, options.eosdir)
