@@ -157,10 +157,8 @@ private:
   vector <float> probe_dzTrg_vec={};
   vector <float> llkDR_vec={};
 
-  vector <float> analysisBdtG={};
-  vector <float> analysisBdtO={};
-  vector <float> analysisBdtC={};
-  vector <float> analysisBdtCWithSyst={};
+  //vector <float> analysisBdtC={};
+  //vector <float> analysisBdtCWithSyst={};
 
   vector <float> Dmass_vec={};
   vector <float> Dmass_flip_vec={};
