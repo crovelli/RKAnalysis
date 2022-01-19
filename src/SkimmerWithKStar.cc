@@ -19,7 +19,6 @@
 
 using namespace std;
 
-
 float SkimmerWithKStar::DeltaR(float eta1,float  phi1, float eta2, float phi2){
   float PI=3.1415972;
   float deta=eta1-eta2;
@@ -70,15 +69,7 @@ void SkimmerWithKStar::Loop() {
 
   if (fChain == 0) return;
 
-  // Load Analysis MVA weights for G.
-  std::string bdtfileGeorgePFPF = "models/model_PFPF_george.txt";
-  std::vector<std::string> featGeorgePFPF = {"f0","f1", "f2","f3","f4","f5","f6","f7","f8","f9","f10","f11"};
-  const auto fastForestGeorgePFPF = fastforest::load_txt(bdtfileGeorgePFPF.c_str(), featGeorgePFPF);
-  // Load Analysis MVA weights PFLP
-  std::string bdtfileGeorgePFLP = "models/model_PFLP_george.txt";
-  std::vector<std::string> featGeorgePFLP = {"f0","f1", "f2","f3","f4","f5","f6","f7","f8","f9","f10","f11"};
-  const auto fastForestGeorgePFLP = fastforest::load_txt(bdtfileGeorgePFLP.c_str(), featGeorgePFLP);
-
+  /*
   // Load Analysis MVA weights for common BDT
   std::string bdtfileCommonPFPF = "models/xgbmodel_kee_12B_kee_correct_pu_Depth17_PFe_v7.2_0.txt";
   std::vector<std::string> featCommonPFPF = {"f0","f1","f2","f3","f4","f5","f6","f7","f8","f9","f10","f11","f12","f13","f14","f15","f16"};
@@ -87,17 +78,7 @@ void SkimmerWithKStar::Loop() {
   std::string bdtfileCommonPFLP = "models/xgbmodel_kee_12B_kee_correct_pu_Depth17_LowPtPF_v7.2_0.txt";
   std::vector<std::string> featCommonPFLP = {"f0","f1","f2","f3","f4","f5","f6","f7","f8","f9","f10","f11","f12","f13","f14","f15","f16"};
   const auto fastForestCommonPFLP = fastforest::load_txt(bdtfileCommonPFLP.c_str(), featCommonPFLP);
-
-  // Load Analysis MVA weights for Otto
-  std::string bdtfileOttoPFPF = "models/otto_model.txt";
-  std::vector<std::string> featOttoPFPF = {"f0","f1", "f2","f3","f4","f5","f6","f7","f8","f9","f10","f11","f12","f13","f14","f15","f16","f17","f18","f19","f20","f21", "f22","f23","f24","f25"};
-  const auto fastForestOttoPFPF = fastforest::load_txt(bdtfileOttoPFPF.c_str(), featOttoPFPF);
-  // PF+LP
-  std::string bdtfileOttoPFLP = "models/otto_model_pflp.txt";
-  std::vector<std::string> featOttoPFLP = {"f0","f1", "f2","f3","f4","f5","f6","f7","f8","f9","f10","f11","f12","f13","f14","f15","f16","f17","f18","f19","f20","f21", "f22","f23","f24","f25","f26","f27"};
-  const auto fastForestOttoPFLP = fastforest::load_txt(bdtfileOttoPFLP.c_str(), featOttoPFLP);
-
-
+  */
 
   // Loop over events
   Long64_t nentries = fChain->GetEntries();
@@ -400,9 +381,9 @@ void SkimmerWithKStar::Loop() {
       bool commonPresel = false;
       bool etaPresel = fabs(ele1_eta)<2.4 && fabs(ele2_eta)<2.4 && fabs(k_eta)<2.4;
       if (Electron_isPF[ele1_idx]==1 && Electron_isPF[ele2_idx]==1) { // PFPF
-	commonPresel = (BToKEE_svprob[iB]>0.000001) && (BToKEE_fit_cos2D[iB]>0.85) && (theXySig>3.) && k_pt>0.5 && (BTrkdxy2>0.000001) && (ele1_pt)>2.0 && (ele2_pt)>2.0 && (L1id)>-1.5 && (L2id)>-3;
+	commonPresel = (BToKEE_svprob[iB]>0.000001) && (BToKEE_fit_cos2D[iB]>0.85) && (theXySig>3.) && (k_pt>0.5) && (BTrkdxy2>0.000001) && (ele1_pt)>2.0 && (ele2_pt)>2.0 && (L1id)>-1.5 && (L2id)>-3;
       } else {
-	commonPresel = (BToKEE_svprob[iB]>0.000001) && (BToKEE_fit_cos2D[iB]>0.95) && (fabs(BToKEE_k_svip3d[iB])<0.06) && (k_pt>0.5) && (BTrkdxy2>0.000001) && (ele1_pt)>2.0 && (ele2_pt>1.0) && L1id>-2.0 && L2id>0;
+	commonPresel = (BToKEE_svprob[iB]>0.000001) && (BToKEE_fit_cos2D[iB]>0.95) && (fabs(BToKEE_k_svip3d[iB])<0.06) && (k_pt>0.5) && (BTrkdxy2>0.000001) && (ele1_pt)>2.0 && (ele2_pt>1.0) && (L1id>-2.0) && (L2id>0);
       }
       if (!etaPresel)    continue;
       if (!commonPresel) continue;
@@ -771,7 +752,7 @@ void SkimmerWithKStar::Loop() {
 
       float K_iso04_rel = BToKEE_k_iso04[thisB] /BToKEE_fit_k_pt[thisB];
 
-      // Tree : save variables for George and Common BDTs
+      // Tree : save variables for old George's BDT and Common BDTs
       LKdz_vec.push_back(LKdz);
       L1L2dr_vec.push_back(L1L2dr);
       L1L2dr_raw_vec.push_back(L1L2dr_raw);
@@ -784,26 +765,14 @@ void SkimmerWithKStar::Loop() {
       tag_iso04_rel_vec.push_back(L1iso04Rel);
       probe_iso04_rel_vec.push_back(L2iso04Rel);
 
-      // -------------------------------------------------------------
-      // Analysis BDT George 
-      float scoreBdtGeorge=0.;
-      if(Electron_isPF[ele1_idx]&&Electron_isPF[ele2_idx]){
-	std::vector<float> vecBdtGeorge = {thisBsvprob, thisBxysig, ele2_pt, k_pt, thisBcos, LKdz,  L1L2dr, LKdr, L2id, Kiso, BBDPhi, BTrkdxy2 };
-	scoreBdtGeorge = fastForestGeorgePFPF(vecBdtGeorge.data());
-	analysisBdtG.push_back(scoreBdtGeorge);
-      } else {
-	std::vector<float> vecBdtGeorge = {thisBsvprob, thisBxysig, ele2_pt, k_pt, thisBcos, LKdz,  L1L2dr, LKdr, L2id, Kiso, BBDPhi, BTrkdxy2 };
-	scoreBdtGeorge = fastForestGeorgePFLP(vecBdtGeorge.data());
-	analysisBdtG.push_back(scoreBdtGeorge);
-      }
-
 
       // -----------------------------------------------------------
       // Common analysis BDT
       float L1_normpt = ele1_pt/BToKEE_fit_mass[thisB];
       float L2_normpt = ele2_pt/BToKEE_fit_mass[thisB];
       float K_normpt  = k_pt/BToKEE_fit_mass[thisB];
-      
+
+      /*
       float scoreBdtCommon=0.;
       if(Electron_isPF[ele1_idx] && Electron_isPF[ele2_idx]){
 	std::vector<float> vecBdtCommon = { thisBsvprob, thisBxysig, thisBcos, L1_normpt, L2_normpt, K_normpt, LKdz, L1L2dr_raw, LKdr_raw, L1id, L2id, L2iso04Rel, K_iso04_rel, BBDPhi, BTrkdxy2, BToKEE_ptAsym, thisBi3dsig };
@@ -823,70 +792,24 @@ void SkimmerWithKStar::Loop() {
 	if (dosyst_) scoreBdtCommonWithSyst = GetAnBdtWeight(scoreBdtCommon, 0);
 	analysisBdtCWithSyst.push_back(scoreBdtCommonWithSyst);  
       }
-
+      */
       
       // ----------------------------------------------------------------
-      // Analysis BDT Otto PFPF
+      // Variables for old analysis BDT by Otto, PFPF
       float BToKEE_l1_dxy_sig=(Electron_dxy[ele1_idx]) /Electron_dxyErr[ele1_idx];
       float BToKEE_l2_dxy_sig=(Electron_dxy[ele2_idx]) /Electron_dxyErr[ele2_idx];
       float BToKEE_k_dxy_sig=ProbeTracks_dxyS[k_idx];
-
-      float BToKEE_fit_normpt=BToKEE_fit_pt[thisB] /BToKEE_fit_mass[thisB];
-
-      float BToKEE_l_xy_sig = (BToKEE_l_xy[thisB]) /BToKEE_l_xy_unc[thisB];
-      float BToKEE_eleDR= DeltaR(ele1_eta,ele1_phi,ele2_eta,ele2_phi);
-      float BToKEE_llkDR=dll.DeltaR(kTLV);
-      float BToKEE_b_iso04_rel =BToKEE_b_iso04[thisB]/BToKEE_fit_pt[thisB];
-
       float BToKEE_l1_dzTrg=Electron_dzTrg[ele1_idx];
       float BToKEE_l2_dzTrg=Electron_dzTrg[ele2_idx];
       float BToKEE_k_dzTrg=ProbeTracks_dzTrg[k_idx];
-      
-      float BToKEE_l1_pfmvaId_lowPt=Electron_pfmvaId[ele1_idx];
-      if(ele1_pt>5) BToKEE_l1_pfmvaId_lowPt=20;
-
-      float BToKEE_l2_pfmvaId_lowPt=Electron_pfmvaId[ele2_idx];
-      if(ele2_pt>5) BToKEE_l2_pfmvaId_lowPt=20;
-      
-      float BToKEE_l1_pfmvaId_highPt=Electron_pfmvaId[ele1_idx];
-      if(ele1_pt<=5) BToKEE_l1_pfmvaId_highPt=20;
-      
-      float BToKEE_l2_pfmvaId_highPt=Electron_pfmvaId[ele2_idx];
-      if(ele2_pt<=5) BToKEE_l2_pfmvaId_highPt=20;
-
+      // 
+      float BToKEE_eleDR= DeltaR(ele1_eta,ele1_phi,ele2_eta,ele2_phi);
+      float BToKEE_llkDR=dll.DeltaR(kTLV);
+      float BToKEE_b_iso04_rel =BToKEE_b_iso04[thisB]/BToKEE_fit_pt[thisB];
+      //
+      // D-related variables
       float BToKEE_k_DCASig = ProbeTracks_DCASig[k_idx];
-
-      float scoreBdtOtto=0.;
-      if(Electron_isPF[ele1_idx]&&Electron_isPF[ele2_idx]){
-	std::vector<float> vecBdtOtto = {BToKEE_b_iso04_rel, BToKEE_eleDR, thisBcos, K_normpt,
-					 L1_normpt, L2_normpt, BToKEE_fit_normpt,
-					 BToKEE_k_DCASig, BToKEE_k_dzTrg, K_iso04_rel, BToKEE_k_svip2d[thisB], BToKEE_k_svip3d[thisB],
-					 BToKEE_l1_dxy_sig, BToKEE_l1_dzTrg, L1iso04Rel, 
-					 BToKEE_l1_pfmvaId_highPt, BToKEE_l1_pfmvaId_lowPt,
-					 BToKEE_l2_dxy_sig,BToKEE_l2_dzTrg, L2iso04Rel,
-					 BToKEE_l2_pfmvaId_highPt, BToKEE_l2_pfmvaId_lowPt, 
-					 thisBxysig,BToKEE_llkDR, BToKEE_ptAsym, thisBsvprob};
-	
-	scoreBdtOtto = fastForestOttoPFPF(vecBdtOtto.data());
-	analysisBdtO.push_back(scoreBdtOtto);
-		
-      } else {
-	std::vector<float> vecBdtOtto = {BToKEE_b_iso04_rel, BToKEE_eleDR, thisBcos, K_normpt,
-					 L1_normpt, L2_normpt, BToKEE_fit_normpt,
-					 BToKEE_k_DCASig, BToKEE_k_dzTrg, K_iso04_rel, 
-					 BToKEE_k_svip2d[thisB], BToKEE_k_svip3d[thisB],
-					 BToKEE_l1_dxy_sig, BToKEE_l1_dzTrg, L1iso04Rel, 
-					 Electron_mvaId[ele1_idx],
-					 BToKEE_l1_pfmvaId_highPt, BToKEE_l1_pfmvaId_lowPt,
-					 BToKEE_l2_dxy_sig,BToKEE_l2_dzTrg, L2iso04Rel,
-					 Electron_mvaId[ele2_idx],
-					 BToKEE_l2_pfmvaId_highPt, BToKEE_l2_pfmvaId_lowPt, 
-					 thisBxysig,BToKEE_llkDR, BToKEE_ptAsym, thisBsvprob};
-	
-	scoreBdtOtto = fastForestOttoPFLP(vecBdtOtto.data());
-	analysisBdtO.push_back(scoreBdtOtto);
-      }
-
+      // 
       TLorentzVector l1_pihypoTLV(0,0,0,0);
       l1_pihypoTLV.SetPtEtaPhiM(ele1_pt,ele1_eta,ele1_phi,0.139);
       TLorentzVector l2_pihypoTLV(0,0,0,0);
@@ -948,11 +871,11 @@ void SkimmerWithKStar::Loop() {
       }
 
 
-      // Tree: save further variables for Otto's BDT
+      // Tree: save further variables for old Otto's BDT
       eleDR_vec.push_back(BToKEE_eleDR);
       k_DCASig_vec.push_back(BToKEE_k_DCASig);
       k_svip3d_vec.push_back(BToKEE_k_svip3d[thisB]);
-      // queste forse si possono rimuovere? start -------------
+      // Not used anymore - start -------------
       b_iso04_rel_vec.push_back(BToKEE_b_iso04_rel);
       k_dzTrg_vec.push_back(BToKEE_k_dzTrg);
       k_svip2d_vec.push_back(BToKEE_k_svip2d[thisB]);
@@ -962,8 +885,7 @@ void SkimmerWithKStar::Loop() {
       probe_dxy_sig_vec.push_back(BToKEE_l2_dxy_sig);
       probe_dzTrg_vec.push_back(BToKEE_l2_dzTrg);
       llkDR_vec.push_back(BToKEE_llkDR);
-      // queste forse si possono rimuovere? end -------------
-      
+      // Not used anymore - end -------------
       Dmass_vec.push_back(BToKEE_Dmass);
       Dmass_flip_vec.push_back(BToKEE_Dmass_flip);
       Dmass_ll_vec.push_back(BToKEE_Dmass_ll);
@@ -1067,10 +989,8 @@ void SkimmerWithKStar::Loop() {
     probe_isLowPt.clear();  
     probe_id.clear();  
 
-    analysisBdtG.clear();
-    analysisBdtO.clear();
-    analysisBdtC.clear();
-    analysisBdtCWithSyst.clear(); 
+    //analysisBdtC.clear();
+    //analysisBdtCWithSyst.clear(); 
 
     LKdz_vec.clear();
     L1L2dr_vec.clear();
@@ -1397,10 +1317,8 @@ void SkimmerWithKStar::bookOutputTree()
   if(sampleID>1){
     outTree_->Branch("p4TrkKStar", "std::vector<float>", &p4TrkKStar);  
   }
-  outTree_->Branch("analysisBdtG", "std::vector<float>", &analysisBdtG);
-  outTree_->Branch("analysisBdtO", "std::vector<float>", &analysisBdtO);
-  outTree_->Branch("analysisBdtC", "std::vector<float>", &analysisBdtC);
-  outTree_->Branch("analysisBdtCWithSyst", "std::vector<float>", &analysisBdtCWithSyst);
+  // outTree_->Branch("analysisBdtC", "std::vector<float>", &analysisBdtC);
+  // outTree_->Branch("analysisBdtCWithSyst", "std::vector<float>", &analysisBdtCWithSyst);
   
   outTree_->Branch("LKdz", "std::vector<float>", &LKdz_vec);
   outTree_->Branch("L1L2dr", "std::vector<float>", &L1L2dr_vec);
