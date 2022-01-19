@@ -17,7 +17,7 @@ void tnpForBTreeFormat(const char* filename, int isPFPF) {
   TFile *fileOrig = 0;
   TTree *treeOrig = 0;
 
-  fileOrig = TFile::Open(TString("/tmp/crovelli/")+TString(filename));
+  fileOrig = TFile::Open(TString("./")+TString(filename));
   if( fileOrig ) {
     fileOrig->cd();
     treeOrig = (TTree*)fileOrig->Get("TaPtree");
@@ -39,7 +39,9 @@ void tnpForBTreeFormat(const char* filename, int isPFPF) {
   int nentriesOrig = treeOrig->GetEntries();   
 
   // Tree for the final format
-  TFile *fileNew = TFile::Open(TString("/tmp/crovelli/FormattedTnPForB_")+TString(filename),"recreate");
+  TFile *fileNew;
+  if (isPFPF)  fileNew = TFile::Open(TString("./FormattedTnPForB_PFPF_")+TString(filename),"recreate");
+  if (!isPFPF) fileNew = TFile::Open(TString("./FormattedTnPForB_PFLPT_")+TString(filename),"recreate");
   fileNew->ls();
   fileNew->cd();
   TDirectory *myDir = (TDirectory*)fileNew->mkdir("tnpAna");
@@ -95,9 +97,7 @@ void tnpForBTreeFormat(const char* filename, int isPFPF) {
   vector<float>   *b2DOrder = nullptr;  
   vector<float>   *bXYOrder = nullptr;  
   vector<float>   *p4Trk = nullptr;  
-  vector<float>   *analysisBdtG = nullptr;  
-  vector<float>   *analysisBdtO = nullptr;  
-  vector<float>   *analysisBdtC = nullptr;  
+  //vector<float>   *analysisBdtC = nullptr;  
   vector<float>   *LKdz = nullptr;  
   vector<float>   *L1L2dr = nullptr;  
   vector<float>   *L1L2dr_raw = nullptr;  
@@ -172,9 +172,7 @@ void tnpForBTreeFormat(const char* filename, int isPFPF) {
   TBranch        *b_b2DOrder;   //!
   TBranch        *b_bXYOrder;   //!
   TBranch        *b_p4Trk;   //!
-  TBranch        *b_analysisBdtG;   //!
-  TBranch        *b_analysisBdtO;   //!
-  TBranch        *b_analysisBdtC;   //!
+  //TBranch        *b_analysisBdtC;   //!
   TBranch        *b_LKdz;   //!
   TBranch        *b_L1L2dr;   //!
   TBranch        *b_L1L2dr_raw;   //!
@@ -248,9 +246,7 @@ void tnpForBTreeFormat(const char* filename, int isPFPF) {
   treeOrig->SetBranchAddress("b2DOrder", &b2DOrder, &b_b2DOrder);
   treeOrig->SetBranchAddress("bXYOrder", &bXYOrder, &b_bXYOrder);
   treeOrig->SetBranchAddress("p4Trk", &p4Trk, &b_p4Trk);
-  treeOrig->SetBranchAddress("analysisBdtG", &analysisBdtG, &b_analysisBdtG);
-  treeOrig->SetBranchAddress("analysisBdtO", &analysisBdtO, &b_analysisBdtO);
-  treeOrig->SetBranchAddress("analysisBdtC", &analysisBdtC, &b_analysisBdtC);
+  //treeOrig->SetBranchAddress("analysisBdtC", &analysisBdtC, &b_analysisBdtC);
   treeOrig->SetBranchAddress("LKdz", &LKdz, &b_LKdz);
   treeOrig->SetBranchAddress("L1L2dr", &L1L2dr, &b_L1L2dr);
   treeOrig->SetBranchAddress("L1L2dr_raw", &L1L2dr_raw, &b_L1L2dr_raw);
@@ -286,6 +282,7 @@ void tnpForBTreeFormat(const char* filename, int isPFPF) {
   // New variables
   Int_t     theNvtx;
   Int_t     theHLT7;
+  Int_t     theHLT9;
   Float_t   tagPt;
   Float_t   tagEta;
   Float_t   tagPhi;
@@ -330,6 +327,7 @@ void tnpForBTreeFormat(const char* filename, int isPFPF) {
     TTree *theTreeNew = trees[i];
     
     theTreeNew->Branch("theHLT7", &theHLT7, "theHLT7/I");
+    theTreeNew->Branch("theHLT9", &theHLT9, "theHLT9/I");
     theTreeNew->Branch("theNvtx", &theNvtx, "theNvtx/I");
     
     theTreeNew->Branch("tagPt",&tagPt,"tagPt/F");
@@ -393,7 +391,10 @@ void tnpForBTreeFormat(const char* filename, int isPFPF) {
       // PFPF or PFLPT
       if ( isPFPF==1 && (tag_isPF->at(ii)==0 || probe_isPF->at(ii)==0) ) continue;
       if ( isPFPF==0 && (tag_isPF->at(ii)==1 && probe_isPF->at(ii)==1) ) continue;
-      
+
+      // Remove "inf"
+      if (fit_Bxysig->at(ii)>100000000) continue;
+
       /*
       // further selection on electrons (chiara, eventualmente da stringere cosi' nel dumper)
       if (tag_pt->at(ii)<1.5)   continue;   
@@ -410,6 +411,7 @@ void tnpForBTreeFormat(const char* filename, int isPFPF) {
 
       // save new variables, making flat tree
       theHLT7 = hlt7;     
+      theHLT9 = hlt9;     
       //
       theNvtx = nvtx;     
       //
