@@ -1,6 +1,6 @@
 #!/usr/bin/env python3.9 
 import os, math, optparse, ROOT
-from sklearn.externals import joblib
+import joblib
 import glob
 from shutil import copy2
 

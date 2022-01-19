@@ -1,6 +1,6 @@
 ### source /cvmfs/sft.cern.ch/lcg/views/LCG_96python3/x86_64-centos7-gcc8-opt/setup.sh
 import os, math, optparse, ROOT
-from sklearn.externals import joblib
+import joblib
 import glob
 from shutil import copy2
 
