@@ -92,6 +92,7 @@ def main():
     #look for the current directory
     #######################################
     pwd = os.environ['PWD']
+    print ('pwd = ', pwd) 
     scramarch = os.environ['SCRAM_ARCH']
     #######################################
     inputListfile=open(inputlist)
@@ -114,10 +115,15 @@ def main():
             print('after dir: ', ntpfile)
 
             # prepare the txt with root files
+            # print ('pwd = ', pwd)
             icfgfilename = pwd+"/"+opt.prefix+"/"+output+"/cfg/tnp_"+str(ijob)+".txt"
             icfgfile = open(icfgfilename,'w')
             icfgfile.write(ntpfile)
             icfgfile.close()
+
+            # copy the computeBdtOutputBatch.py file in a new identical one, with progressing number
+            batchname = 'computeBdtOutputBatch_'+str(ijob)+'.py'                                                    
+            os.system("cp computeBdtOutputBatch.py "+batchname)            
 
             # prepare the script to run
             outputname = jobdir+"/src/submit_"+str(ijob)+".src"
@@ -129,18 +135,21 @@ def main():
             outputfile.write('source /cvmfs/sft.cern.ch/lcg/views/LCG_96python3/x86_64-centos7-gcc8-opt/setup.sh\n')
 
             if(opt.ispfpf=='1'):
-                outputfile.write('python computeBdtOutputBatch.py --isPFPF=1 --ijob='+str(ijob)+' --rootfile='+ntpfileA+' --eosdir='+opt.eosdir+' \n')
+                outputfile.write('python '+batchname+' --isPFPF=1 --ijob='+str(ijob)+' --rootfile='+ntpfileA+' --eosdir='+opt.eosdir+' \n')
             if(opt.ispfpf=='0'): 
-                outputfile.write('python computeBdtOutputBatch.py --isPFPF=0 --ijob='+str(ijob)+' --rootfile='+ntpfileA+' --eosdir='+opt.eosdir+' \n')
+                outputfile.write('python '+batchname+' --isPFPF=0 --ijob='+str(ijob)+' --rootfile='+ntpfileA+' --eosdir='+opt.eosdir+' \n')
 
             # change name to the outputfile with BDT added    
             rootoutputfile = ntpfileA
             rootoutputfile = rootoutputfile.replace('.root', '')+'_withBDT.root'
-            outputfile.write('mv '+ntpfileA+' '+rootoutputfile+' \n')
+            #outputfile.write('mv '+ntpfileA+' '+rootoutputfile+' \n')
+            ##outputfile.write('mv '+pwd+"/"+ntpfileA+' '+pwd+"/"+rootoutputfile+' \n')
+            outputfile.write('mv /tmp/'+ntpfileA+' /tmp/'+rootoutputfile+' \n')
 
             if(opt.eos!=''): 
-                outputfile.write('cp '+rootoutputfile+' '+opt.eosdir+' \n')
-#                outputfile.write('rm '+rootoutputfile+' \n')
+                #outputfile.write('cp '+rootoutputfile+' '+opt.eosdir+' \n')
+                ##outputfile.write('cp '+pwd+"/"+rootoutputfile+' '+opt.eosdir+' \n')
+                outputfile.write('cp /tmp/'+rootoutputfile+' '+opt.eosdir+' \n')
             outputfile.close()
 
             logfile = logdir+output+"_"+str(ijob)+".log"
