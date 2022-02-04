@@ -38,7 +38,9 @@ def computeBdtBatch(isPFPF, ijob, therootfile, theeosdir):
     # --------------------------------------------------
     # Copy the input file from EOS to here
     startfile = theeosdir+therootfile
-    endfile = therootfile
+    #endfile = os.environ['PWD']+therootfile
+    endfile = '/tmp/'+therootfile
+    print('pwd = ', os.environ['PWD'])
     print('startfile = ', startfile)
     print('endfile = ', endfile)
     copy2(startfile, endfile)
