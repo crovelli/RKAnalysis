@@ -19,19 +19,19 @@ def computeBdt(isPFPF):
     # -------------------------------------------------
     # To be modified - XGBoost model in .pkl
     if (isPFPF==1): 
-        fmodel = '../models/xgbmodel_kee_12B_kee_correct_pu_Depth17_PFe_v7.2_0.pkl'
+        fmodel = '../models/xgbmodel_kee_12B_kee_correct_pu_Depth17_PFe_v7.3_0.pkl'
         print('dumping BDT output for PFPF reading from...'.format(fmodel))
 
     if (isPFPF==0): 
-        fmodel = '../models/xgbmodel_kee_12B_kee_correct_pu_Depth17_LowPtPF_v7.2_0.pkl'
+        fmodel = '../models/xgbmodel_kee_12B_kee_correct_pu_Depth17_LowPtPF_v7.3_0.pkl'
         print('dumping BDT output for PFLPT reading from...'.format(fmodel))
 
     # To be modified - input root tree with variables
-    data_dir = '/tmp/crovelli'
+    data_dir = './'
     if (isPFPF==1):
-        tf = ROOT.TFile.Open('{d}/FormattedTnPForB_PFPF_Merged_March21_BuToKee_mc_bparkPU_0.root'.format(d=data_dir), "update")
+        tf = ROOT.TFile.Open('{d}/FormattedTnPForB_PFPF_B_EEFilter_v3_bparkPU.root'.format(d=data_dir), "update")
     if (isPFPF==0):
-        tf = ROOT.TFile.Open('{d}/FormattedTnPForB_PFLPT_Merged_March21_BuToKee_mc_bparkPU_0.root'.format(d=data_dir), "update")
+        tf = ROOT.TFile.Open('{d}/FormattedTnPForB_PFLPT_B_EEFilter_v3_bparkPU.root'.format(d=data_dir), "update")
         
     # -------------------------------------------------
     # -------------------------------------------------
